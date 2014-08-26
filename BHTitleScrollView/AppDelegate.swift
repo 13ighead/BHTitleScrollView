@@ -9,7 +9,7 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UITableViewDataSource {
                             
     var window: UIWindow?
     var titleScrollViewController: BHTitleScrollViewController!
@@ -18,14 +18,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         var vcarr = [UIViewController]()
         for i in 0..<4 {
-            var vc = UIViewController(nibName: nil, bundle: nil)
+            let vc = UIViewController(nibName: nil, bundle: nil)
             vc.title = "page\(i)"
+            var frame = window!.frame
+            frame.origin.x = CGFloat(i) * frame.width
+            vc.view.frame = frame
+            let a = UITableView(frame: window!.frame)
+            a.dataSource = self
+            vc.view.addSubview(a)
+            vc.view.tag = i
+            println(a)
             vcarr.append(vc)
         }
         titleScrollViewController = BHTitleScrollViewController(firstPage: 0, pages: vcarr)
         window!.rootViewController = UINavigationController(rootViewController: titleScrollViewController)
         return true
     }
+
+func tableView(tableView: UITableView!, numberOfRowsInSection section: Int) -> Int {
+println(tableView.superview?.tag)
+return 50
+}
+
+func tableView(tableView: UITableView!, cellForRowAtIndexPath indexPath: NSIndexPath!) -> UITableViewCell! {
+let cell = UITableViewCell(style: .Default, reuseIdentifier: "cell")
+cell.textLabel.text = "\(indexPath.row)"
+return cell
+}
 
     func applicationWillResignActive(application: UIApplication!) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

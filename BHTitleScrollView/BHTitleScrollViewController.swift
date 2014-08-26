@@ -16,7 +16,7 @@ class BHTitleScrollViewController: UIViewController, UIScrollViewDelegate {
     
     var titleScrollBar: BHTitleScrollBar!
     
-    var pages =  [UIViewController]()
+    var pages = [UIViewController]()
     
     init(firstPage: Int!, pages: [UIViewController]!) {
         super.init(nibName: nil, bundle: nil)
@@ -32,10 +32,60 @@ class BHTitleScrollViewController: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.whiteColor()
-        
+//++++++
+//        initPages()
+//        initGesture()
+//++++++
         initPageScrollView()
         initTitleScrollBar()
     }
+    
+    func initPages() {
+        let curView = pages[curPage].view
+        view.addSubview(curView)
+    }
+    func initGesture() {
+        let swipeGestureRight = UISwipeGestureRecognizer(target: self, action: "didSwipeGesture:")
+        swipeGestureRight.direction = .Right
+        view.addGestureRecognizer(swipeGestureRight)
+        
+        let swipeGestureLeft = UISwipeGestureRecognizer(target: self, action: "didSwipeGesture:")
+        swipeGestureLeft.direction = .Left
+        view.addGestureRecognizer(swipeGestureLeft)
+    
+    }
+    
+    func didSwipeGesture(swipeGestureRecognizer: UISwipeGestureRecognizer) {
+        if swipeGestureRecognizer.direction == .Left {
+            if curPage >= pages.count - 1 {
+                return
+            }
+            view.addSubview(pages[curPage+1].view)
+            pages[curPage+1].view.frame = CGRectMake(view.frame.width, 0, view.frame.width, view.frame.height)
+            UIView.beginAnimations(nil, context: nil)
+            UIView.setAnimationCurve(.EaseIn)
+            pages[curPage].view.frame = CGRectMake(-view.frame.width, 0, view.frame.width, view.frame.height)
+            pages[curPage+1].view.frame = CGRectMake(0, 0, view.frame.width, view.frame.height)
+            pages[curPage].view.removeFromSuperview()
+            curPage = curPage + 1
+        } else if swipeGestureRecognizer.direction == .Right {
+            if curPage <= 0 {
+                return
+            }
+            view.addSubview(pages[curPage-1].view)
+            pages[curPage - 1].view.frame = CGRectMake(-view.frame.width, 0, view.frame.width, view.frame.height)
+            UIView.beginAnimations(nil, context: nil)
+            UIView.setAnimationCurve(.EaseIn)
+            pages[curPage].view.frame = CGRectMake(view.frame.width, 0, view.frame.width, view.frame.height)
+            pages[curPage].view.removeFromSuperview()
+            pages[curPage - 1].view.frame = CGRectMake(0, 0, view.frame.width, view.frame.height)
+            curPage = curPage - 1
+        }
+        self.titleScrollBar.turnPage(self.curPage, animated: true)
+    
+    }
+    
+    //+++++++++
     
     /*
      *初始化页面容器
